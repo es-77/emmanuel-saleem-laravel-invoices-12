@@ -1,6 +1,6 @@
 {
-    "name": "laraveldaily/laravel-invoices",
-    "description": "Missing invoices for Laravel",
+    "name": "emmanuel-saleem-laraveldaily/laravel-invoices-laravel-12",
+    "description": "Missing invoices for Laravel 12 (forked and updated)",
     "license": "GPL-3.0-only",
     "authors": [
         {
@@ -14,7 +14,7 @@
     "keywords": ["Laravel", "Invoice", "Invoices", "PDF"],
     "require": {
         "php": ">=8.2",
-        "barryvdh/laravel-dompdf": "^v3.1.1",
+        "barryvdh/laravel-dompdf": "^3.1",
         "illuminate/http": "^10|^11|^12",
         "illuminate/support": "^10|^11|^12",
         "symfony/http-foundation": "^6|^7"

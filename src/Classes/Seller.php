@@ -10,45 +10,81 @@ use LaravelDaily\Invoices\Contracts\PartyContract;
 class Seller implements PartyContract
 {
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var string
      */
     public $name;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var string
      */
     public $address;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var string
      */
     public $code;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var string
      */
     public $vat;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var string
      */
     public $phone;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var array
      */
     public $custom_fields;
 
     /**
      * Seller constructor.
      */
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
-        $this->name          = config('invoices.seller.attributes.name');
-        $this->address       = config('invoices.seller.attributes.address');
-        $this->code          = config('invoices.seller.attributes.code');
-        $this->vat           = config('invoices.seller.attributes.vat');
-        $this->phone         = config('invoices.seller.attributes.phone');
-        $this->custom_fields = config('invoices.seller.attributes.custom_fields');
+        if (empty($attributes)) {
+            $this->loadDefaultAttributes();
+        } else {
+            $this->loadAttributes($attributes);
+        }
+    }
+
+    /**
+     * Load default attributes from config or use fallbacks
+     */
+    protected function loadDefaultAttributes(): void
+    {
+        $this->name = $this->getConfig('invoices.seller.attributes.name', 'Default Company');
+        $this->address = $this->getConfig('invoices.seller.attributes.address', 'Default Address');
+        $this->code = $this->getConfig('invoices.seller.attributes.code', 'DEFAULT');
+        $this->vat = $this->getConfig('invoices.seller.attributes.vat', 'VAT123456');
+        $this->phone = $this->getConfig('invoices.seller.attributes.phone', '+1234567890');
+        $this->custom_fields = $this->getConfig('invoices.seller.attributes.custom_fields', []);
+    }
+
+    /**
+     * Load attributes from provided array
+     */
+    protected function loadAttributes(array $attributes): void
+    {
+        $this->name = $attributes['name'] ?? $this->getConfig('invoices.seller.attributes.name', 'Default Company');
+        $this->address = $attributes['address'] ?? $this->getConfig('invoices.seller.attributes.address', 'Default Address');
+        $this->code = $attributes['code'] ?? $this->getConfig('invoices.seller.attributes.code', 'DEFAULT');
+        $this->vat = $attributes['vat'] ?? $this->getConfig('invoices.seller.attributes.vat', 'VAT123456');
+        $this->phone = $attributes['phone'] ?? $this->getConfig('invoices.seller.attributes.phone', '+1234567890');
+        $this->custom_fields = $attributes['custom_fields'] ?? $this->getConfig('invoices.seller.attributes.custom_fields', []);
+    }
+
+    /**
+     * Get config value with fallback
+     */
+    protected function getConfig(string $key, $default = null)
+    {
+        if (function_exists('config')) {
+            return config($key, $default);
+        }
+        return $default;
     }
 }

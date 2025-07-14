@@ -23,9 +23,9 @@ class UpdateCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('This will overwrite default templates and translations.');
 
@@ -38,5 +38,7 @@ class UpdateCommand extends Command
 
             $this->info('Invoices Views and Translations updated successfully.');
         }
+
+        return self::SUCCESS;
     }
 }

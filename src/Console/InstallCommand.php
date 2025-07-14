@@ -23,9 +23,9 @@ class InstallCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $this->comment('Publishing Invoices Assets...');
         $this->callSilent('vendor:publish', ['--tag' => 'invoices.assets']);
@@ -40,5 +40,7 @@ class InstallCommand extends Command
         $this->callSilent('vendor:publish', ['--tag' => 'invoices.config']);
 
         $this->info('Invoices scaffolding installed successfully.');
+
+        return self::SUCCESS;
     }
 }

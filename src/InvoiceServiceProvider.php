@@ -14,7 +14,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->registerResources();
         $this->defineAssetPublishing();
@@ -25,7 +25,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerResources()
+    protected function registerResources(): void
     {
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'invoices');
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'invoices');
@@ -36,7 +36,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function defineAssetPublishing()
+    protected function defineAssetPublishing(): void
     {
         $this->publishes([
             INVOICES_PATH . '/public' => public_path('vendor/invoices'),
@@ -48,7 +48,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         if (! defined('INVOICES_PATH')) {
             define('INVOICES_PATH', realpath(__DIR__ . '/../'));
@@ -65,7 +65,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/invoices.php', 'invoices');
     }
@@ -75,7 +75,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function offerPublishing()
+    protected function offerPublishing(): void
     {
         if ($this->app->runningInConsole()) {
             // Publishing the configuration file.
@@ -100,7 +100,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerServices()
+    protected function registerServices(): void
     {
         $this->app->singleton('invoice', function ($app) {
             return new Invoice();
@@ -112,7 +112,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -127,7 +127,7 @@ class InvoiceServiceProvider extends ServiceProvider
      *
      * @return array
      */
-    public function provides()
+    public function provides(): array
     {
         return ['invoice'];
     }

@@ -165,43 +165,98 @@ class Invoice
     public function __construct($name = '')
     {
         // Invoice
-        $this->name     = $name ?: __('invoices::invoice.invoice');
-        $this->seller   = app()->make(config('invoices.seller.class'));
+        $this->name     = $name ?: $this->getDefaultInvoiceName();
+        $this->seller   = $this->createSeller();
         $this->items    = Collection::make([]);
         $this->template = 'default';
 
         // Date
         $this->date           = Carbon::now();
-        $this->date_format    = config('invoices.date.format');
-        $this->pay_until_days = config('invoices.date.pay_until_days');
+        $this->date_format    = $this->getConfig('invoices.date.format', 'Y-m-d');
+        $this->pay_until_days = $this->getConfig('invoices.date.pay_until_days', 7);
 
         // Serial Number
-        $this->series               = config('invoices.serial_number.series');
-        $this->sequence_padding     = config('invoices.serial_number.sequence_padding');
-        $this->delimiter            = config('invoices.serial_number.delimiter');
-        $this->serial_number_format = config('invoices.serial_number.format');
-        $this->sequence(config('invoices.serial_number.sequence'));
+        $this->series               = $this->getConfig('invoices.serial_number.series', 'AA');
+        $this->sequence_padding     = $this->getConfig('invoices.serial_number.sequence_padding', 5);
+        $this->delimiter            = $this->getConfig('invoices.serial_number.delimiter', '.');
+        $this->serial_number_format = $this->getConfig('invoices.serial_number.format', '{SERIES}{DELIMITER}{SEQUENCE}');
+        $this->sequence($this->getConfig('invoices.serial_number.sequence', 1));
 
         // Filename
         $this->filename($this->getDefaultFilename($this->name));
 
         // Currency
-        $this->currency_code                = config('invoices.currency.code');
-        $this->currency_fraction            = config('invoices.currency.fraction');
-        $this->currency_symbol              = config('invoices.currency.symbol');
-        $this->currency_decimals            = config('invoices.currency.decimals');
-        $this->currency_decimal_point       = config('invoices.currency.decimal_point');
-        $this->currency_thousands_separator = config('invoices.currency.thousands_separator');
-        $this->currency_format              = config('invoices.currency.format');
+        $this->currency_code                = $this->getConfig('invoices.currency.code', 'eur');
+        $this->currency_fraction            = $this->getConfig('invoices.currency.fraction', 'ct.');
+        $this->currency_symbol              = $this->getConfig('invoices.currency.symbol', '€');
+        $this->currency_decimals            = $this->getConfig('invoices.currency.decimals', 2);
+        $this->currency_decimal_point       = $this->getConfig('invoices.currency.decimal_point', '.');
+        $this->currency_thousands_separator = $this->getConfig('invoices.currency.thousands_separator', '');
+        $this->currency_format              = $this->getConfig('invoices.currency.format', '{VALUE} {SYMBOL}');
 
         // Paper
-        $this->paperOptions = config('invoices.paper');
+        $this->paperOptions = $this->getConfig('invoices.paper', ['size' => 'a4', 'orientation' => 'portrait']);
 
-        // DomPDF options
-        $this->options = array_merge(app('dompdf.options'), config('invoices.dompdf_options') ?? ['enable_php' => true]);
+        // DomPDF options - Updated for Laravel 12 compatibility
+        $dompdfOptions = [];
+        if ($this->isLaravelAvailable() && app()->bound('dompdf.options')) {
+            $dompdfOptions = app('dompdf.options');
+        }
+        $this->options = array_merge($dompdfOptions, $this->getConfig('invoices.dompdf_options', ['enable_php' => true]));
 
-        $this->disk          = config('invoices.disk');
+        $this->disk          = $this->getConfig('invoices.disk', 'local');
         $this->table_columns = static::TABLE_COLUMNS;
+    }
+
+    /**
+     * Check if Laravel is available
+     *
+     * @return bool
+     */
+    protected function isLaravelAvailable(): bool
+    {
+        return function_exists('app') && function_exists('config');
+    }
+
+    /**
+     * Get config value with fallback
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    protected function getConfig(string $key, $default = null)
+    {
+        if ($this->isLaravelAvailable()) {
+            return config($key, $default);
+        }
+        return $default;
+    }
+
+    /**
+     * Get default invoice name
+     *
+     * @return string
+     */
+    protected function getDefaultInvoiceName(): string
+    {
+        if ($this->isLaravelAvailable()) {
+            return __('invoices::invoice.invoice');
+        }
+        return 'Invoice';
+    }
+
+    /**
+     * Create seller instance
+     *
+     * @return PartyContract
+     */
+    protected function createSeller(): PartyContract
+    {
+        if ($this->isLaravelAvailable()) {
+            return app()->make(config('invoices.seller.class'));
+        }
+        return new \LaravelDaily\Invoices\Classes\Seller();
     }
 
     /**

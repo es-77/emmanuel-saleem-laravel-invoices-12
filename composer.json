@@ -1,6 +1,7 @@
 {
     "name": "emmanuel-saleem-laraveldaily/laravel-invoices-laravel-12",
     "description": "Missing invoices for Laravel 12 (forked and updated)",
+    "version": "1.0.0",
     "license": "GPL-3.0-only",
     "authors": [
         {
